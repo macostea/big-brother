@@ -1,0 +1,4 @@
+collector:
+  timeout: 5
+server:
+  port: 23232

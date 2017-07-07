@@ -1,0 +1,4 @@
+servers:
+  - name: localhost
+    addr: localhost
+    port: 23232
