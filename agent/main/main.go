@@ -9,7 +9,7 @@ import (
 
 func main() {
 	c := config.AgentConfig{}
-	c.ReadConfig("agent/config/config.yaml")
+	c.ReadConfig("config.yaml") // TODO: pass this as a CLI parameter
 
 	srv := server.AgentServer{}
 	col := collector.DataCollector{}

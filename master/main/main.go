@@ -8,7 +8,7 @@ import (
 
 func main() {
 	servers := config.Servers{}
-	servers.ReadConfig("master/config/servers.yaml")
+	servers.ReadConfig("master/config/servers.yaml") // TODO: pass this as a CLI parameter
 
 	c := connector.C{}
 	for _, s := range servers.Servers {
