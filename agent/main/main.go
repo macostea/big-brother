@@ -5,11 +5,16 @@ import (
 	"time"
 	"github.com/macostea/big-brother/agent/collector"
 	"github.com/macostea/big-brother/agent/config"
+	"flag"
 )
 
 func main() {
+	var configFile = flag.String("config", "config.yaml", "Path to the config file")
+
+	flag.Parse()
+
 	c := config.AgentConfig{}
-	c.ReadConfig("config.yaml") // TODO: pass this as a CLI parameter
+	c.ReadConfig(*configFile)
 
 	srv := server.AgentServer{}
 	col := collector.DataCollector{}

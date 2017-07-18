@@ -2,21 +2,22 @@ DATE    ?= $(shell date +%FT%T%z)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo v0)
 
-.PHONY: all agent master clean get-deps
-all: clean get-deps agent master
+.PHONY: all clean get-deps
+all: get-deps out/bin/agent out/bin/master
 
-agent:
+out/bin/agent:
 		go build \
 		-tags release \
 		-ldflags '-X agent/cmd.Version=$(VERSION) -X agent/cmd.BuildDate=$(DATE)' \
-		-o out/bin/agent agent/main/main.go
+		-o out/bin/agent/agent agent/main/main.go
+		cp agent/config/config.yaml out/bin/agent
 
-master:
+out/bin/master:
 		go build \
 		-tags release \
 		-ldflags '-X master/cmd.Version=$(VERSION) -X master/cmd.BuildDate=$(DATE)' \
-		-o out/bin/master master/main/main.go
-
+		-o out/bin/master/master master/main/main.go
+		cp master/config/servers.yaml out/bin/master
 clean:
 		rm -rf out/
 		echo Clean complete
