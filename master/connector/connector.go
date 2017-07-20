@@ -59,7 +59,6 @@ func handleConnection(conn net.Conn, server config.Server, infoChannel chan<- ma
 		// TODO: Maybe remove this code. It is redundant now that we have the type
 		for key, val := range info {
 			var obj model.CollectedDataItem
-
 			switch key {
 			case "cpu":
 				obj = &model.CPU{}

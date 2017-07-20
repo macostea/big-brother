@@ -6,113 +6,69 @@
 
     <style>
         body { font: 12px Arial;}
-
-        path {
-            stroke: steelblue;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: grey;
-            stroke-width: 1;
-            shape-rendering: crispEdges;
-        }
     </style>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.6.0/rickshaw.min.css">
 </head>
 <body>
 
 <div id="chart_container">
     <div id="chart"></div>
-    <div id="timeline"></div>
-    <div id="preview"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.6.0/rickshaw.min.js"></script>
+<script src="plotly.min.js"></script>
 <script>
-    let palette = new Rickshaw.Color.Palette({scheme: "spectrum2001"});
-
     window.onload = () => {
-        let data = [[],[],[],[],[],[],[],[]];
-        let graph = new Rickshaw.Graph({
-            element: document.getElementById("chart"),
-            width: 900,
-            height: 500,
-            renderer: 'line',
-            stroke: true,
-            preserve: true,
-            xScale: d3.time.scale(),
-            series: [
-                {
-                    color: palette.color(0),
-                    data: data[0],
-                    name: 'cpu0'
-                },
-                {
-                    color: palette.color(1),
-                    data: data[1],
-                    name: 'cpu1'
-                },
-                {
-                    color: palette.color(2),
-                    data: data[2],
-                    name: 'cpu2'
-                },
-                {
-                    color: palette.color(3),
-                    data: data[3],
-                    name: 'cpu3'
-                },
-                {
-                    color: palette.color(4),
-                    data: data[4],
-                    name: 'cpu4'
-                },
-                {
-                    color: palette.color(5),
-                    data: data[5],
-                    name: 'cpu5'
-                },
-                {
-                    color: palette.color(6),
-                    data: data[6],
-                    name: 'cpu6'
-                },
-                {
-                    color: palette.color(7),
-                    data: data[7],
-                    name: 'cpu7'
-                }
-            ]
-        });
-
-        graph.render();
-
-        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-            graph: graph,
-            xFormatter: function(x) {
-                return new Date(x * 1000).toString();
-            }
-        } );
-
-        var ticksTreatment = 'glow';
-
-        var xAxis = new Rickshaw.Graph.Axis.X( {
-            graph: graph,
-            tickFormat: function(x) {
-                return new Date(x).toLocaleTimeString();
-            }
-        } );
-        xAxis.render();
-        var yAxis = new Rickshaw.Graph.Axis.Y( {
-            graph: graph
-        } );
-        yAxis.render();
+        const time = new Date();
+        Plotly.plot('chart', [
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#80CAF6'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#8bf6c2'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#eef6c1'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#f6c592'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#f68383'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#f6709e'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#dc83f6'}
+            },
+            {
+                y: [0],
+                x: [time],
+                mode: 'lines',
+                line: {color: '#8569f6'}
+            },
+        ]);
 
         let ws;
 
@@ -125,10 +81,11 @@
         ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
             for (let i=0; i<message.localhost.cpu.count; i++) {
-                data[i].push({x: Date.parse(message.localhost.cpu.collection_time), y: message.localhost.cpu.load[i]});
+                Plotly.extendTraces('chart', {
+                    y: [[message.localhost.cpu.load[i]]],
+                    x: [[new Date(message.localhost.cpu.collection_time)]]
+                }, [i]);
             }
-            graph.update();
-
             ws.send("ack\n");
         };
 
