@@ -6,6 +6,7 @@ import (
 	"github.com/macostea/big-brother/agent/collector"
 	"github.com/macostea/big-brother/agent/config"
 	"flag"
+	"github.com/macostea/big-brother/model"
 )
 
 func main() {
@@ -17,7 +18,10 @@ func main() {
 	c.ReadConfig(*configFile)
 
 	srv := server.AgentServer{}
-	col := collector.DataCollector{}
+
+	dataItems := []model.CollectedDataItem{&model.CPU{}, &model.Mem{}, &model.Disk{}}
+
+	col := collector.NewDataCollector(dataItems)
 	infoChannel := col.StartCollecting(time.Second * c.Collector.Timeout)
 
 	go func(s *server.AgentServer) {

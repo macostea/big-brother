@@ -2,8 +2,8 @@ DATE    ?= $(shell date +%FT%T%z)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo v0)
 
-.PHONY: all clean get-deps
-all: get-deps out/bin/agent out/bin/master
+.PHONY: all clean get-deps test
+all: get-deps test out/bin/agent out/bin/master
 
 out/bin/agent:
 		go build \
@@ -24,3 +24,6 @@ clean:
 
 get-deps:
 		go get -t ./...
+
+test:
+		go test ./... -cover

@@ -7,16 +7,19 @@ import (
 	"encoding/json"
 )
 
-var dataItems = []model.CollectedDataItem{&model.CPU{}, &model.Mem{}, &model.Disk{}}
+type DataCollector struct {
+	DataItems []model.CollectedDataItem
+}
 
+func NewDataCollector(dataItems []model.CollectedDataItem) *DataCollector {
+	return &DataCollector{dataItems}
+}
 
-type DataCollector struct {}
-
-func (d *DataCollector) GetAllInfo() map[string]model.CollectedDataItem {
+func (d *DataCollector) getAllInfo() map[string]model.CollectedDataItem {
 	info := make(map[string]model.CollectedDataItem)
-	for index := range dataItems {
-		info[dataItems[index].Type()] = dataItems[index]
-		dataItems[index].GetInfo()
+	for index := range d.DataItems {
+		info[d.DataItems[index].Type()] = d.DataItems[index]
+		d.DataItems[index].GetInfo()
 	}
 
 	return info
@@ -29,7 +32,7 @@ func (d *DataCollector) StartCollecting(duration time.Duration) <-chan []byte {
 	go func(channel chan<- []byte) {
 		for range ticker.C {
 			log.Debug("Time to get info")
-			jsonString, err := json.Marshal(d.GetAllInfo())
+			jsonString, err := json.Marshal(d.getAllInfo())
 			if err != nil {
 				log.Error("Failed to convert info to JSON", "err", err)
 			}
