@@ -1,4 +1,4 @@
 collector:
-  timeout: 5
+  timeout: 5s
 server:
   port: 23232

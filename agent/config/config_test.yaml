@@ -1,0 +1,4 @@
+collector:
+  timeout: 2s
+server:
+  port: 1234
