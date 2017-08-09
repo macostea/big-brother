@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/macostea/big-brother/network"
+	"github.com/mgutz/logxi/v1"
 )
 
 type AgentServer struct {
@@ -24,6 +25,12 @@ func (a *AgentServer) StopServer() {
 	a.isStarted = false
 }
 
-func (a *AgentServer) SendInfoToClients(info []byte) {
-	a.N.SendToClients(info)
+func (a *AgentServer) SendInfoToClients(info []byte) bool {
+	if a.isStarted {
+		a.N.SendToClients(info)
+		return true
+	} else {
+		log.Error("Send info called when server is not running")
+		return false
+	}
 }
