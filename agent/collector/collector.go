@@ -37,7 +37,7 @@ func (d *DataCollector) StartCollecting(duration time.Duration) <-chan []byte {
 				log.Error("Failed to convert info to JSON", "err", err)
 			}
 
-			channel <- jsonString
+			channel <- append(jsonString, '\n')
 		}
 	}(infoChannel)
 
