@@ -5,6 +5,7 @@ import (
 	"github.com/macostea/big-brother/master/connector"
 	"github.com/macostea/big-brother/master/server"
 	"flag"
+	"github.com/macostea/big-brother/network"
 )
 
 func main() {
@@ -15,7 +16,9 @@ func main() {
 	servers := config.MasterConfig{}
 	servers.ReadConfig(*configFile)
 
-	c := connector.C{}
+	networkController := network.NewController()
+
+	c := connector.NewServerConnector(networkController)
 	for _, s := range servers.Servers {
 		c.ConnectToServer(s)
 	}

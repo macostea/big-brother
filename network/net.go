@@ -5,21 +5,26 @@ import (
 	"github.com/mgutz/logxi/v1"
 	"container/list"
 	"time"
+	"bufio"
+	"fmt"
 )
 
 type Net interface {
 	StartServer(port string)
 	StopServer()
 	SendToClients(info []byte)
+	ConnectToServer(address, port string)
+	StartReadingFromServer(infoChanel chan <-[]byte)
 }
 
 type Controller struct {
-	Connections *list.List
-	listener net.Listener
+	ClientConnections *list.List
+	listener          net.Listener
+	ServerConnection  net.Conn
 }
 
 func NewController() *Controller {
-	return &Controller{list.New(), nil}
+	return &Controller{list.New(), nil, nil}
 }
 
 func (nc *Controller) StartServer(port string) {
@@ -33,7 +38,7 @@ func (nc *Controller) StartServer(port string) {
 		if conn, err := ln.Accept(); err != nil {
 			log.Error("Failed to accept connection: ", "err", err)
 		} else {
-			nc.Connections.PushBack(conn)
+			nc.ClientConnections.PushBack(conn)
 		}
 	}
 }
@@ -49,7 +54,7 @@ func (nc *Controller) StopServer() {
 func (nc *Controller) SendToClients(info []byte) {
 	connectionsToRemove := list.New()
 
-	for e := nc.Connections.Front(); e != nil; e = e.Next() {
+	for e := nc.ClientConnections.Front(); e != nil; e = e.Next() {
 		if connection, ok := e.Value.(net.Conn); ok {
 			if !isClientAlive(connection) {
 				connectionsToRemove.PushBack(e)
@@ -65,6 +70,34 @@ func (nc *Controller) SendToClients(info []byte) {
 	}
 
 	nc.cleanConnections(connectionsToRemove)
+}
+
+func (nc *Controller) ConnectToServer(address, port string) {
+	conn, err := net.Dial("tcp", address + ":" + port)
+
+	if err != nil {
+		log.Error("Failed to connect to server","err", err)
+		return
+	}
+
+	nc.ServerConnection = conn
+}
+
+func (nc *Controller) StartReadingFromServer(infoChanel chan <-[]byte) {
+	fmt.Fprintf(nc.ServerConnection, "%s", "ack")
+	defer nc.ServerConnection.Close()
+
+	for {
+		status, err := bufio.NewReader(nc.ServerConnection).ReadBytes('\n')
+
+		if err != nil {
+			log.Error("Failed to read from server", "err", err)
+			break
+		}
+
+		infoChanel <- status
+		fmt.Fprintf(nc.ServerConnection, "%s", "ack")
+	}
 }
 
 func isClientAlive(client net.Conn) bool {
@@ -84,6 +117,6 @@ func isClientAlive(client net.Conn) bool {
 func (nc *Controller) cleanConnections(connectionsToRemove *list.List) {
 	log.Debug("Cleaning closed connections")
 	for e := connectionsToRemove.Front(); e != nil; e = e.Next() {
-		nc.Connections.Remove(e.Value.(*list.Element))
+		nc.ClientConnections.Remove(e.Value.(*list.Element))
 	}
 }

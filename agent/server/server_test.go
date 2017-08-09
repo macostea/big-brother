@@ -26,6 +26,14 @@ func (mn *MockNetwork) SendToClients(info []byte) {
 	mn.InfoSent = info
 }
 
+func (mn *MockNetwork) ConnectToServer(address, port string) {
+	// Not used here
+}
+
+func (mn *MockNetwork) StartReadingFromServer(infoChanel chan <-[]byte) {
+	// Not used here
+}
+
 func TestAgentServer_StartServer(t *testing.T) {
 	mn := &MockNetwork{}
 	mn.Done = make(chan bool)
