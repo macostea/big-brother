@@ -1,0 +1,4 @@
+servers:
+  - name: test
+    addr: test
+    port: 12345

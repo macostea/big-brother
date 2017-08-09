@@ -17,7 +17,7 @@ out/bin/master:
 		-tags release \
 		-ldflags '-X master/cmd.Version=$(VERSION) -X master/cmd.BuildDate=$(DATE)' \
 		-o out/bin/master/master master/main/main.go
-		cp master/config/servers.yaml out/bin/master
+		cp master/config/config.yaml out/bin/master
 clean:
 		rm -rf out/
 		echo Clean complete

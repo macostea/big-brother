@@ -12,11 +12,11 @@ type Server struct {
 	Port string `yaml:"port"`
 }
 
-type Servers struct {
+type MasterConfig struct {
 	Servers []Server
 }
 
-func (s *Servers) ReadConfig(filename string) {
+func (s *MasterConfig) ReadConfig(filename string) {
 	configData, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Cannot read servers config file", "err", err)

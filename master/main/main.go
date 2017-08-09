@@ -12,7 +12,7 @@ func main() {
 
 	flag.Parse()
 
-	servers := config.Servers{}
+	servers := config.MasterConfig{}
 	servers.ReadConfig(*configFile)
 
 	c := connector.C{}
